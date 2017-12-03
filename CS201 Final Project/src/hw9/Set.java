@@ -1,6 +1,6 @@
 package hw9;
 //Set
-//TEATST
+//tst
 //Kai Delorenzo & Teal Witter
 //CS 201 A HW 9
 
