@@ -253,8 +253,6 @@ class SetCanvas extends Canvas {
     }
 
     public void paint(Graphics g) {
-        //Dimension d = getSize();
-        //Image offscreen = createImage(d.width, d.height);
         Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
         Image offscreen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration().createCompatibleVolatileImage(d.width, d.height);
         Graphics g2 = offscreen.getGraphics();
