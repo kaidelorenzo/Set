@@ -1,7 +1,7 @@
 package hw9;
 //Set
 
-//Kai Delorenzo + Teal Witter
+//Kai Delorenzo & Teal Witter
 //CS 201 A HW 9
 
 import java.applet.*;
@@ -146,9 +146,10 @@ public class Set extends Applet implements KeyListener {
 				changeScore(userScore, -3);
 			}
 			userEntry.clear();
-		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65 && userEntry.contains(c.onDisplay.get(keyCode - 65))) {
+		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65
+				&& userEntry.contains(c.onDisplay.get(keyCode - 65))) {
 			userEntry.remove(c.onDisplay.get(keyCode - 65));
-			
+
 		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65
 				&& userEntry.size() < 3) {
 
