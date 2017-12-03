@@ -1,6 +1,6 @@
 package hw9;
 //Set
-// Accept my commit
+
 //Kai Delorenzo & Teal Witter
 //CS 201 A HW 9
 
