@@ -253,13 +253,18 @@ class SetCanvas extends Canvas {
     }
 
     public void paint(Graphics g) {
+        Dimension d = getSize();
+        Image offscreen = createImage(d.width, d.height);
+        Graphics g2 = offscreen.getGraphics();
+        g2.setFont(getFont());
         for (int i = 0; i < onDisplay.size(); i++) {
             if (parent.userEntry.contains(onDisplay.get(i))) {
-                drawCard(g, i, 1.1);
+                drawCard(g2, i, 1.1);
             } else {
-                drawCard(g, i, .8);
+                drawCard(g2, i, .8);
             }
         }
+        g.drawImage(offscreen, 0, 0, null);
     }
 
     public Color lighten(Color color) {
