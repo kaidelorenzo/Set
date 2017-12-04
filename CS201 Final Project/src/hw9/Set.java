@@ -20,12 +20,12 @@ public class Set extends Applet implements KeyListener {
 	protected Vector<Integer> userEntry;
 
 	public void init() {
+		// We need to make the letters serif 
 		// Font to use in Applet
 		setFont(new Font("TimesRoman", Font.PLAIN, 16));
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
 		userEntry = new Vector<Integer>();
-
 		setLayout(new BorderLayout());
 		add("North", makeScorePanel()); // add at top
 		add("South", makeTimePanel()); // add at bottom
