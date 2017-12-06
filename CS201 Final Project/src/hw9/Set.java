@@ -19,23 +19,26 @@ public class Set extends Applet implements KeyListener {
 	protected Label userScore, compScore;
 	protected Vector<Integer> userEntry;
 
-	public void init() {
-		// We need to make the letters serif 
-		// Font to use in Applet
-		setFont(new Font("TimesRoman", Font.PLAIN, 16));
+	public void init() {		
+	//initializes instance variables
+	    //nice, readable font
+		setFont(new Font("BellMT", Font.PLAIN, 16));
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
+		//store user's guesses
 		userEntry = new Vector<Integer>();
 		setLayout(new BorderLayout());
 		add("North", makeScorePanel()); // add at top
 		add("South", makeTimePanel()); // add at bottom
-		add("Center", makeSetPanell()); // add in remaining area (fills space)
+		add("Center", makeSetPanell()); // add middle
 	}
 
 	private Component makeSetPanell() {
+	//center canvas with cards
 		c = new SetCanvas(this);
-		c.addKeyListener(this);
+		c.addKeyListener(this); //key listener
 		Panel setPanel = new Panel();
+
 		setPanel.setBackground(Color.white);
 		setPanel.setLayout(new BorderLayout());
 		setPanel.add("Center", c);
@@ -44,17 +47,21 @@ public class Set extends Applet implements KeyListener {
 	}
 
 	private Component makeTimePanel() {
+	// panel for displaying time
+	    //TODO
 		Panel timePanel = new Panel();
+
 		timePanel.setBackground(Color.black);
 
 		return timePanel;
 	}
 
 	private Component makeScorePanel() {
+	// score panel with title and credits
 		Panel scorePanel = new Panel();
 
 		scorePanel.setForeground(Color.white);
-		scorePanel.setBackground(c.dlave);
+		scorePanel.setBackground(c.dlave); // access color from canvas class
 		scorePanel.setLayout(new GridBagLayout());
 		GridBagConstraints d = new GridBagConstraints();
 
@@ -79,6 +86,7 @@ public class Set extends Applet implements KeyListener {
 
 	public void changeD(GridBagConstraints d, double weightX, int gridWidth,
 			int gridHeight, int gridX, int gridY) {
+	// manipulates words so that appear correctly
 		d.fill = GridBagConstraints.HORIZONTAL;
 		d.weightx = weightX;
 		d.gridwidth = gridWidth;
@@ -88,63 +96,73 @@ public class Set extends Applet implements KeyListener {
 	}
 
 	public void changeScore(Label score, int change) {
-		String[] sArray = score.getText().split(" ");
-		int value = Integer.parseInt(sArray[1]) + change;
-		score.setText(sArray[0] + " " + Integer.toString(value));
+	// changes score in a label
+		String[] sArray = score.getText().split(" "); // accesses current score
+		int value = Integer.parseInt(sArray[1]) + change; // updates score
+		score.setText(sArray[0] + " " + Integer.toString(value)); // puts label back together
 	}
 
 	public void keyTyped(KeyEvent e) {
+	// placeholder
 	}
 
 	public void keyPressed(KeyEvent e) {
-		// System.out.println(e.getKeyCode());
+	// handles key presses
 		int keyCode = e.getKeyCode();
-		if (keyCode == KeyEvent.VK_BACK_SPACE && userEntry.size() != 0) {
-			// System.out.println("You pressed delete!");
+		if (keyCode == KeyEvent.VK_BACK_SPACE && userEntry.size() != 0) {	
+		// removes most recent element in userEntry
 			userEntry.remove(userEntry.size() - 1);
 		} else if (keyCode == KeyEvent.VK_ESCAPE) {
-			if (!c.containsSet) {
+		// user indicated they think there are no sets
+			if (c.findSets(c.onDisplay).size() == 0) {
+			// if there are no sets, give one point and add a card
 				changeScore(userScore, 1);
 				c.onDisplay.add(c.deckOrder.pop());
 			} else {
+			// otherwise, minus one point!
 				changeScore(userScore, -1);
 			}
-		} else if (keyCode == KeyEvent.VK_ENTER && userEntry.size() == 3) {
-			// System.out.println("You pressed enter!");
+		} else if (keyCode == KeyEvent.VK_ENTER && userEntry.size() == 3) {	
+		// enters current guesses
+		    // convert to userArray in order to sort for easy comparison
 			Integer[] userArray = new Integer[3];
 			userEntry.toArray(userArray);
 			Arrays.sort(userArray);
+			// finds all the actual sets
 			Vector<Integer[]> sets = c.findSets(c.onDisplay);
+			// checks for whether the guessed set is there
 			boolean contained = false;
 			for (int i = 0; i < sets.size(); i++) {
 				if (Arrays.equals(userArray, sets.get(i)))
 					contained = true;
 			}
 			if (contained) {
-				// System.out.println("You got a set!");
+			    // if contained, updates score and removes cards
 				changeScore(userScore, 3);
 				c.onDisplay.remove(userEntry.get(0));
 				c.onDisplay.remove(userEntry.get(1));
 				c.onDisplay.remove(userEntry.get(2));
 			} else {
+			    // else, minus 3!
 				changeScore(userScore, -3);
 			}
 			userEntry.clear();
 		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65
 				&& userEntry.contains(c.onDisplay.get(keyCode - 65))) {
+		    // if existing card typed again, then it is removed
 			userEntry.remove(c.onDisplay.get(keyCode - 65));
 
 		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65
 				&& userEntry.size() < 3) {
-
+		    // if valid card is typed, then it is added
 			userEntry.add(c.onDisplay.get(keyCode - 65));
-			// System.out.println("You entered a letter!");
 		}
+		//repaints 
 		c.repaint();
-		c.containsSet = c.findSets(c.onDisplay).size() != 0;
 	}
 
 	public void keyReleased(KeyEvent e) {
+	// placeholder
 	}
 
 }
@@ -153,13 +171,11 @@ class SetCanvas extends Canvas {
 
 	// instance variables
 	Set parent;
-	protected int[][] deckMaster;
-	// 0,1,2,3 => color, filling, shape, number
-	protected Stack<Integer> deckOrder;
-	protected Vector<Integer> onDisplay;
-	protected boolean containsSet;
+	protected int[][] deckMaster; // 0,1,2,3 => color, filling, shape, number
+	protected Stack<Integer> deckOrder; // random, non-repeated indices to deckMaster
+	protected Vector<Integer> onDisplay; // cards on display
 
-	// colors
+	// pretty colors :)
 	static final Color dteal = new Color(0, 153, 153);
 	static final Color lteal = new Color(153, 255, 255);
 	static final Color dlave = new Color(153, 51, 255);
@@ -169,23 +185,22 @@ class SetCanvas extends Canvas {
 
 	// constructors
 	public SetCanvas(Set s) {
-		parent = s;
+		parent = s; // allows access to parent instance variables
 		deckMaster = new int[81][4];
 		deckOrder = new Stack<Integer>();
 		onDisplay = new Vector<Integer>(26);
 
-		// initialize deckMaster
+		// initialize deckMaster with all 81 permutations of {0,1,2}^3
 		for (int i = 0; i < 3; i++) {
 			for (int j = 0; j < 3; j++) {
 				for (int k = 0; k < 3; k++) {
 					for (int l = 0; l < 3; l++) {
 						int index = l + 3 * k + 9 * j + 27 * i;
+						//unique index accessible from each element
 						deckMaster[index][0] = i;
 						deckMaster[index][1] = j;
 						deckMaster[index][2] = k;
 						deckMaster[index][3] = l;
-						// System.out.println(Arrays.toString(deckMaster[index]));
-						// System.out.println(index);
 					}
 				}
 			}
@@ -197,47 +212,46 @@ class SetCanvas extends Canvas {
 		Random randInt = new Random();
 		while (counter < 81) {
 			randint = Math.abs(randInt.nextInt() % 81);
+			// checks to see if randInt already in deckOrder
+			// expected O(n) time
 			if (deckOrder.search(randint) < 0) {
 				deckOrder.push(randint);
 				counter++;
-				// System.out.println(randint);
 			}
 		}
 
 		// initialize onDisplay
 		for (int i = 0; i < 12; i++)
 			onDisplay.add(deckOrder.pop());
-		// System.out.println(onDisplay);
-		Vector<Integer[]> sets = findSets(onDisplay);
-		containsSet = sets.size() != 0;
-		// System.out.println(sets.size());
-		// for (int k = 0; k < sets.size(); k++) {
-		// System.out.println(Arrays.toString(sets.get(k)));
-		// }
-
 	}
 
 	public Vector<Integer[]> findSets(Vector<Integer> displayed) {
+	// finds all sets in displayed and returns all unique sets
 		Vector<Integer[]> sets = new Vector<Integer[]>();
+		// vector because unknown number of sets
 		for (int i = 0; i < displayed.size(); i++) {
 			for (int j = i + 1; j < displayed.size(); j++) {
+			    // based on two cards, determines the 'ideal' card that completes the set
 				int[] ideal = new int[4];
 				for (int k = 0; k < 4; k++) {
 					int val1 = deckMaster[displayed.get(i)][k];
 					int val2 = deckMaster[displayed.get(j)][k];
+					// if value the same, then ideal has the same
 					if (val1 == val2)
 						ideal[k] = val1;
+					// if value not the same, then ideal has the one neither had
 					else
-						ideal[k] = 3 - (val1 + val2);
+						ideal[k] = 3 - (val1 + val2); // generates not present value
 				}
+				// use unique index based off of card
 				int index = ideal[3] + 3 * ideal[2] + 9 * ideal[1]
 						+ 27 * ideal[0];
+				// checks whether ideal card in onDisplay
 				if (displayed.contains(index)) {
-					// System.out.println(Arrays.toString(deckMaster[displayed.get(i)]));
-					// System.out.println(Arrays.toString(deckMaster[displayed.get(j)]));
-					// System.out.println(Arrays.toString(deckMaster[index]));
+				    // creates potential addition to sets
 					Integer[] potential = new Integer[] { displayed.get(i),
 							displayed.get(j), index };
+					// sorts so that containment checks can work
 					Arrays.sort(potential);
 					boolean contained = false;
 					for (int l = 0; l < sets.size(); l++) {
@@ -245,6 +259,7 @@ class SetCanvas extends Canvas {
 							contained = true;
 						}
 					}
+					// adds potential if not already in sets
 					if (!contained)
 						sets.add(potential);
 				}
@@ -254,15 +269,20 @@ class SetCanvas extends Canvas {
 	}
 
 	public void paint(Graphics g) {
+	    // got the next two commands from:
 		// https://stackoverflow.com/questions/28477330/java-resize-double-buffer
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		Image offscreen = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration()
 				.createCompatibleVolatileImage(d.width, d.height);
+		// offscreen image for double buffering
 		Graphics g2 = offscreen.getGraphics();
+		// carries over font to g2
 		g2.setFont(getFont());
 		for (int i = 0; i < onDisplay.size(); i++) {
+		    // check to see if in userEntry in order
 			if (parent.userEntry.contains(onDisplay.get(i))) {
+			// draws bigger card to indicate it is displayed
 				drawCard(g2, i, 1.1);
 			} else {
 				drawCard(g2, i, .8);
@@ -272,6 +292,7 @@ class SetCanvas extends Canvas {
 	}
 
 	public Color lighten(Color color) {
+	// lightens darker color to ligher color
 		if (color == dteal)
 			return lteal;
 		if (color == dlave)
@@ -281,10 +302,12 @@ class SetCanvas extends Canvas {
 	}
 
 	public Color getColor(int i) {
+	// gets color based off of i
 		return new Color[] { dteal, dlave, dsalm }[i];
 	}
 
 	public Color getFilling(Color color, int i) {
+	// determines correct filling style depending on i
 		Color filling = null;
 		if (i == 0)
 			filling = Color.white;
@@ -296,9 +319,10 @@ class SetCanvas extends Canvas {
 	}
 
 	public void drawCard(Graphics g, int index, double multiply) {
+	// draws each individual card
 		Dimension d = getSize();
 		Graphics2D g2 = (Graphics2D) g;
-		g2.setStroke(new BasicStroke(3));
+		g2.setStroke(new BasicStroke(3)); // makes lines bolder
 		int[] features = deckMaster[onDisplay.get(index)];
 		// height and width of cards
 		int h = d.height / 3;
@@ -306,13 +330,14 @@ class SetCanvas extends Canvas {
 		// height and width of shapes
 		int sh = (int) (multiply * 3 * h / 5);
 		int sw = (int) (multiply * 1 * w / 4);
-		// x and y of cards
+		// x and y of each space
 		int y = h / 2 + h * ((index) % 3);
 		int x = w / 2 + w * ((index) / 3);
-		// x and y of shape
+		// x and y of each shape within the space
 		int sy;
 		int sx = 0;
 		sy = y - 1 * sh / 2;
+		// updates sx based on the number of shapes in each card
 		switch (features[3]) {
 		case 0:
 			sx = x - 2 * sw / 4;
@@ -327,12 +352,16 @@ class SetCanvas extends Canvas {
 		Color color = getColor(features[0]);
 		Color filling = getFilling(color, features[1]);
 		if (multiply < 1) {
+		    // draws letter only if not big
+		    parent.setFont(new Font("BellMT", Font.PLAIN, 20));
 			g.setColor(color);
 			g.drawString(Character.toString((char) (index + 97)),
 					x - 4 * w / 11, y - 4 * h / 11);
 		}
 		for (int j = 0; j <= features[3]; j++) {
+		    // draws each shape within the card
 			g.setColor(filling);
+			// draws filling in shape based on feature value
 			switch (features[2]) {
 			case 0:
 				g.fillOval(sx, sy, sw, sh);
@@ -347,6 +376,7 @@ class SetCanvas extends Canvas {
 				break;
 			}
 			g.setColor(color);
+			// draws shape based on feature value
 			switch (features[2]) {
 			case 0:
 				g2.drawOval(sx, sy, sw, sh);
@@ -360,9 +390,8 @@ class SetCanvas extends Canvas {
 						new int[] { sy, sy + sh / 2, sy + sh, sy + sh / 2 }, 4);
 				break;
 			}
-			sx += sw + 1 * sw / 4;
+			sx += sw + 1 * sw / 4; // updates sx for each shape
 		}
 
 	}
-
 }
