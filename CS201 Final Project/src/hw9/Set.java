@@ -16,6 +16,7 @@ public class Set extends Applet implements KeyListener {
 	// instance variables
 	protected int time;
 	protected SetCanvas c;
+	protected TimerCanvas t;
 	protected Label userScore, compScore;
 	protected Vector<Integer> userEntry;
 
@@ -48,10 +49,13 @@ public class Set extends Applet implements KeyListener {
 
 	private Component makeTimePanel() {
 	// panel for displaying time
-	    //TODO
+	    t = new TimerCanvas();
+
 		Panel timePanel = new Panel();
 
-		timePanel.setBackground(Color.black);
+		timePanel.setBackground(Color.white);
+		timePanel.setLayout(new BorderLayout());
+		timePanel.add("Center", t);
 
 		return timePanel;
 	}
@@ -159,6 +163,9 @@ public class Set extends Applet implements KeyListener {
 		}
 		//repaints 
 		c.repaint();
+		t.timeAlloted = 50L;
+		t.timeLeft = 40L;
+		t.repaint();		
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -394,4 +401,24 @@ class SetCanvas extends Canvas {
 		}
 
 	}
+}
+
+class TimerCanvas extends Canvas {
+    
+    // instance variables
+    long timeAlloted;
+    long timeLeft;
+    
+    // constructor
+    public void TimerCanvas() {
+        
+    }
+        
+    public void paint(Graphics g) {
+        Dimension d = getSize();
+        int rectHeight = (int) d.getHeight();
+        int rectWidth = (int) (d.getWidth() * timeLeft / timeAlloted);
+        g.setColor(new Color(255, 102, 102));
+        g.drawRect(0, 0, rectWidth, rectHeight);
+    }
 }
