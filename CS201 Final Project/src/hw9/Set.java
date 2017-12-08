@@ -28,7 +28,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 		setFont(new Font("BellMT", Font.PLAIN, 20));
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
-		title = new Label("Set", Label.CENTER);
+		title = new Label("      Set      ", Label.CENTER);
 		// store user's guesses
 		setEntry = new Vector<Integer>();
 
@@ -78,7 +78,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 
 		changeD(d, 0.5, 2, 2, 1, 0);
 		Panel titlePanel = new Panel();
-		titlePanel.setFont(new Font("TimesRoman", Font.PLAIN, 31));
+		titlePanel.setFont(new Font("BellMT", Font.PLAIN, 31));
 		titlePanel.add(title);
 		scorePanel.add(titlePanel, d);
 
