@@ -476,7 +476,7 @@ class TimerCanvas extends Canvas {
 		int rectWidth = (int) ((d.width * timeLeft / timeAllotted));
 		// g.setColor(new Color(255, 102, 102));
 		g.setColor(Colors.dlave);
-		g.fillRoundRect(0, 0, rectWidth, rectHeight, 3, 10);
+		g.fillRoundRect(0, 0, rectWidth, rectHeight, 3, 6);
 	}
 }
 
