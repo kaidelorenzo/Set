@@ -471,12 +471,22 @@ class TimerCanvas extends Canvas {
 
 	// height
 	public void paint(Graphics g) {
+		double factor = timeLeft / timeAllotted;
 		Dimension d = getSize();
 		int rectHeight = d.height;
-		int rectWidth = (int) ((d.width * timeLeft / timeAllotted));
-		// g.setColor(new Color(255, 102, 102));
-		g.setColor(Colors.dlave);
+		int rectWidth = (int) ((d.width * factor));
+		g.setColor(getColor(factor));
+		//g.setColor(Colors.dlave);
 		g.fillRoundRect(0, 0, rectWidth, rectHeight, 3, 6);
+	}
+	public Color getColor(double power)
+	// https://stackoverflow.com/questions/340209/generate-colors-between-red-and-green-for-a-power-meter
+	{
+	    double H = power * 0.4; // Hue (note 0.4 = Green, see huge chart below)
+	    double S = 0.9; // Saturation
+	    double B = 0.9; // Brightness
+
+	    return Color.getHSBColor((float)H, (float)S, (float)B);
 	}
 }
 
