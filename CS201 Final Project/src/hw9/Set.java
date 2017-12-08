@@ -19,7 +19,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 	protected SetCanvas c;
 	protected TimerCanvas t;
 	protected Label userScore, compScore;
-	protected Vector<Integer> userEntry;
+	protected Vector<Integer> setEntry;
 	protected Thread thread;
 
 	public void init() {
@@ -29,7 +29,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
 		// store user's guesses
-		userEntry = new Vector<Integer>();
+		setEntry = new Vector<Integer>();
 
 		setLayout(new BorderLayout());
 		add("North", makeScorePanel()); // add at top
@@ -54,6 +54,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 		Panel timePanel = new Panel();
 		timePanel.setPreferredSize(d);
 		timePanel.setLayout(new BorderLayout());
+		timePanel.setBackground(Color.white);
 		timePanel.add("Center", t);
 
 		return timePanel;
@@ -118,10 +119,39 @@ public class Set extends Applet implements KeyListener, Runnable {
 			}
 
 			if (t.timeLeft < 0) {
-				computerTurn();
-				t.resetTime(getScore(userScore), getScore(compScore));
-			}
-			System.out.println(t.timeLeft);
+				//computerTurn();
+                Vector<Integer[]> sets = c.findSets(c.onDisplay);
+                if (sets.size() == 0) {
+                    changeScore(compScore, 1);
+                    c.onDisplay.add(c.deckOrder.pop());
+                    c.onDisplay.add(c.deckOrder.pop());
+                    c.onDisplay.add(c.deckOrder.pop());
+                } else {
+                    changeScore(compScore, 3);
+                    // show the set for one second
+                    setEntry = new Vector<Integer>(Arrays.asList(sets.get(0)));
+                    c.repaint();
+                    try {
+                        Thread.sleep(1000); // wait 1 second
+                    } catch (InterruptedException e){
+                        // do nothing
+                    }
+                    // show the old board for one second
+                    setEntry = new Vector<Integer>(); 
+                    c.repaint();
+                    try {
+                        Thread.sleep(1000); // wait 1 second
+                    } catch (InterruptedException e){
+                        // do nothing
+                    }
+                    c.onDisplay.remove(sets.get(0)[0]);
+                    c.onDisplay.remove(sets.get(0)[1]);
+                    c.onDisplay.remove(sets.get(0)[2]);
+                }
+                c.repaint();
+                t.resetTime(getScore(userScore), getScore(compScore));
+            }	
+			//System.out.println(t.timeLeft);
 			t.timeLeft -= 0.01;
 			t.repaint();
 		}
@@ -146,6 +176,8 @@ public class Set extends Applet implements KeyListener, Runnable {
 		if (sets.size() == 0) {
 			changeScore(compScore, 1);
 			c.onDisplay.add(c.deckOrder.pop());
+			c.onDisplay.add(c.deckOrder.pop());
+			c.onDisplay.add(c.deckOrder.pop());
 		} else {
 			changeScore(compScore, 3);
 			c.onDisplay.remove(sets.get(0)[0]);
@@ -162,25 +194,27 @@ public class Set extends Applet implements KeyListener, Runnable {
 	public void keyPressed(KeyEvent e) {
 		// handles key presses
 		int keyCode = e.getKeyCode();
-		if (keyCode == KeyEvent.VK_BACK_SPACE && userEntry.size() != 0) {
-			// removes most recent element in userEntry
-			userEntry.remove(userEntry.size() - 1);
+		if (keyCode == KeyEvent.VK_BACK_SPACE && setEntry.size() != 0) {
+			// removes most recent element in setEntry 
+			setEntry.remove(setEntry.size() - 1);
 		} else if (keyCode == KeyEvent.VK_ESCAPE) {
 			// user indicated they think there are no sets
 			if (c.findSets(c.onDisplay).size() == 0) {
 				// if there are no sets, give one point and add a card
 				changeScore(userScore, 1);
 				c.onDisplay.add(c.deckOrder.pop());
+				c.onDisplay.add(c.deckOrder.pop());
+				c.onDisplay.add(c.deckOrder.pop());
 				t.resetTime(getScore(userScore), getScore(compScore));
 			} else {
 				// otherwise, minus one point!
 				changeScore(userScore, -1);
 			}
-		} else if (keyCode == KeyEvent.VK_ENTER && userEntry.size() == 3) {
+		} else if (keyCode == KeyEvent.VK_ENTER && setEntry.size() == 3) {
 			// enters current guesses
 			// convert to userArray in order to sort for easy comparison
 			Integer[] userArray = new Integer[3];
-			userEntry.toArray(userArray);
+			setEntry.toArray(userArray);
 			Arrays.sort(userArray);
 			// finds all the actual sets
 			Vector<Integer[]> sets = c.findSets(c.onDisplay);
@@ -193,24 +227,24 @@ public class Set extends Applet implements KeyListener, Runnable {
 			if (contained) {
 				// if contained, updates score and removes cards
 				changeScore(userScore, 3);
-				c.onDisplay.remove(userEntry.get(0));
-				c.onDisplay.remove(userEntry.get(1));
-				c.onDisplay.remove(userEntry.get(2));
+				c.onDisplay.remove(setEntry.get(0));
+				c.onDisplay.remove(setEntry.get(1));
+				c.onDisplay.remove(setEntry.get(2));
 				t.resetTime(getScore(userScore), getScore(compScore));
 			} else {
 				// else, minus 3!
 				changeScore(userScore, -3);
 			}
-			userEntry.clear();
+			setEntry.clear();
 		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65
-				&& userEntry.contains(c.onDisplay.get(keyCode - 65))) {
+				&& setEntry.contains(c.onDisplay.get(keyCode - 65))) {
 			// if existing card typed again, then it is removed
-			userEntry.remove(c.onDisplay.get(keyCode - 65));
+			setEntry.remove(c.onDisplay.get(keyCode - 65));
 
 		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65
-				&& userEntry.size() < 3) {
+				&& setEntry.size() < 3) {
 			// if valid card is typed, then it is added
-			userEntry.add(c.onDisplay.get(keyCode - 65));
+			setEntry.add(c.onDisplay.get(keyCode - 65));
 		}
 		// repaints
 		c.repaint();
@@ -333,8 +367,8 @@ class SetCanvas extends Canvas {
 		// carries over font to g2
 		g2.setFont(getFont());
 		for (int i = 0; i < onDisplay.size(); i++) {
-			// check to see if in userEntry in order
-			if (parent.userEntry.contains(onDisplay.get(i))) {
+			// check to see if in setEntry in order
+			if (parent.setEntry.contains(onDisplay.get(i))) {
 				// draws bigger card to indicate it is displayed
 				drawCard(g2, i, 1.1);
 			} else {
@@ -474,9 +508,8 @@ class TimerCanvas extends Canvas {
 		double factor = timeLeft / timeAllotted;
 		Dimension d = getSize();
 		int rectHeight = d.height;
-		int rectWidth = (int) ((d.width * factor));
+		int rectWidth = (int) (d.width * factor);
 		g.setColor(getColor(factor));
-		//g.setColor(Colors.dlave);
 		g.fillRoundRect(0, 0, rectWidth, rectHeight, 3, 6);
 	}
 	public Color getColor(double power)
