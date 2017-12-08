@@ -47,7 +47,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 
 	private Component makeTimePanel() {
 		// panel for displaying time
-		int timeHeight = 10;
+		int timeHeight = 12;
 		Dimension d = new Dimension(getSize().width, timeHeight);
 		t = new TimerCanvas();
 
@@ -475,8 +475,8 @@ class TimerCanvas extends Canvas {
 		int rectHeight = d.height;
 		int rectWidth = (int) ((d.width * timeLeft / timeAllotted));
 		// g.setColor(new Color(255, 102, 102));
-		g.setColor(Color.red);
-		g.fillRect(0, 0, rectWidth, rectHeight);
+		g.setColor(Colors.dlave);
+		g.fillRoundRect(0, 0, rectWidth, rectHeight, 3, 10);
 	}
 }
 
