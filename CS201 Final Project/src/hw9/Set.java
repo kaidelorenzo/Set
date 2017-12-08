@@ -1,7 +1,7 @@
 package hw9;
 //Set
 
-//Kai Delorenzo & Teal Witter
+//Kai DeLorenzo & Teal Witter
 //CS 201 A HW 9
 
 import java.applet.*;
