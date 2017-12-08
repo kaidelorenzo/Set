@@ -47,7 +47,8 @@ public class Set extends Applet implements KeyListener, Runnable {
 
 	private Component makeTimePanel() {
 	// panel for displaying time
-	    Dimension d = new Dimension(getSize().width, 40);
+		int timeHeight = 10;
+	    Dimension d = new Dimension(getSize().width, timeHeight);
 		t = new TimerCanvas(); 
 
 	    Panel timePanel = new Panel();
@@ -108,7 +109,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 
 	public void run() {
 	    Thread currentThread = Thread.currentThread();
-	    t.starttime = System.currentTimeMillis();
+	    //t.starttime = System.currentTimeMillis();
 	    while (currentThread == thread) {
 	        try {
 	            Thread.sleep(10); // wait .1 seconds
@@ -120,7 +121,8 @@ public class Set extends Applet implements KeyListener, Runnable {
 	            computerTurn();
 	            t.resetTime(getScore(userScore), getScore(compScore));
 	        }
-	        t.timeLeft -= .01;
+	        System.out.println(t.timeLeft);
+	        t.timeLeft -= 0.01;
 	        t.repaint(); 
 	    }
 	}
@@ -128,7 +130,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 	public void changeScore(Label score, int change) {
 	// changes score in a label
 		String[] sArray = score.getText().split(" "); // accesses current score
-		int value = Integer.parseInt(sArray[1]) + change; // updates score
+		int value = Math.max(0, Integer.parseInt(sArray[1]) + change); // updates score
 		score.setText(sArray[0] + " " + Integer.toString(value)); // puts label back together
 	}
 	
@@ -166,6 +168,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 			// if there are no sets, give one point and add a card
 				changeScore(userScore, 1);
 				c.onDisplay.add(c.deckOrder.pop());
+				t.resetTime(getScore(userScore), getScore(compScore));
 			} else {
 			// otherwise, minus one point!
 				changeScore(userScore, -1);
@@ -190,6 +193,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 				c.onDisplay.remove(userEntry.get(0));
 				c.onDisplay.remove(userEntry.get(1));
 				c.onDisplay.remove(userEntry.get(2));
+				t.resetTime(getScore(userScore), getScore(compScore));
 			} else {
 			    // else, minus 3!
 				changeScore(userScore, -3);
@@ -207,7 +211,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 		}
 		//repaints 
 		c.repaint();
-	    t.resetTime(getScore(userScore), getScore(compScore));
+	    
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -454,8 +458,8 @@ class TimerCanvas extends Canvas {
 
     // instance variables
     long starttime;
-    long timeAllotted;
-    long timeLeft;
+    double timeAllotted;
+    double timeLeft;
     
     // constructor
     public TimerCanvas() {
@@ -463,16 +467,17 @@ class TimerCanvas extends Canvas {
     }
     
     public void resetTime(int userScore, int compScore) {
-        timeAllotted = (long) (45 * (compScore + 1) / (userScore + 1));
+        timeAllotted = (double) (45 * (compScore + 1) / (userScore + 1));
         timeLeft = timeAllotted;
         starttime = System.currentTimeMillis();
     }
-    
+    //height 
     public void paint(Graphics g) {
         Dimension d = getSize();
+        int rectHeight = d.height;
         int rectWidth = (int) ((d.width * timeLeft / timeAllotted));
-        g.setColor(new Color(255, 102, 102));
+        //g.setColor(new Color(255, 102, 102));
         g.setColor(Color.red);
-        g.fillRect(0, 0, rectWidth, 40);
+        g.fillRect(0, 0, rectWidth, rectHeight);
     }
 }
