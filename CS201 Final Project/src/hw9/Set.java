@@ -141,6 +141,7 @@ public class Set extends Applet implements KeyListener, Runnable {
                     c.onDisplay.remove(sets.get(0)[1]);
                     c.onDisplay.remove(sets.get(0)[2]);
                 }
+                setEntry.clear();
                 c.repaint();
                 t.resetTime(getScore(userScore), getScore(compScore));
 			}
@@ -296,7 +297,7 @@ class SetCanvas extends Canvas {
 		int counter = 0;
 		int randint;
 		Random randInt = new Random();
-		while (counter < 30) {
+		while (counter < 81) {
 			randint = Math.abs(randInt.nextInt() % 81);
 			// checks to see if randInt already in deckOrder
 			// expected O(n) time
@@ -499,8 +500,7 @@ class TimerCanvas extends Canvas {
 	}
 
 	public void resetTime(int userScore, int compScore) {
-	    timeAllotted = 1;
-		//timeAllotted = (double) (45 * (compScore + 1) / (userScore + 1));
+		timeAllotted = (double) (30 * (compScore + 1) / (userScore + 1));
 		timeLeft = timeAllotted;
 		starttime = System.currentTimeMillis();
 	}
