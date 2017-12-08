@@ -18,16 +18,17 @@ public class Set extends Applet implements KeyListener, Runnable {
 	protected int time;
 	protected SetCanvas c;
 	protected TimerCanvas t;
-	protected Label userScore, compScore;
+	protected Label title, userScore, compScore;
 	protected Vector<Integer> setEntry;
 	protected Thread thread;
 
 	public void init() {
 		// initializes instance variables
 		// nice, readable font
-		setFont(new Font("BellMT", Font.PLAIN, 16));
+		setFont(new Font("BellMT", Font.PLAIN, 20));
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
+		title = new Label("Set", Label.CENTER);
 		// store user's guesses
 		setEntry = new Vector<Integer>();
 
@@ -78,7 +79,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 		changeD(d, 0.5, 2, 2, 1, 0);
 		Panel titlePanel = new Panel();
 		titlePanel.setFont(new Font("TimesRoman", Font.PLAIN, 31));
-		titlePanel.add(new Label("Set", Label.CENTER));
+		titlePanel.add(title);
 		scorePanel.add(titlePanel, d);
 
 		changeD(d, 0.5, 1, 1, 3, 1);
@@ -119,7 +120,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 			}
 
 			if (t.timeLeft < 0) {
-				//computerTurn();
+			    //computerTurn();
                 Vector<Integer[]> sets = c.findSets(c.onDisplay);
                 if (sets.size() == 0) {
                     changeScore(compScore, 1);
@@ -128,16 +129,8 @@ public class Set extends Applet implements KeyListener, Runnable {
                     c.onDisplay.add(c.deckOrder.pop());
                 } else {
                     changeScore(compScore, 3);
-                    // show the set for one second
+                    // show the computer's set for one second
                     setEntry = new Vector<Integer>(Arrays.asList(sets.get(0)));
-                    c.repaint();
-                    try {
-                        Thread.sleep(1000); // wait 1 second
-                    } catch (InterruptedException e){
-                        // do nothing
-                    }
-                    // show the old board for one second
-                    setEntry = new Vector<Integer>(); 
                     c.repaint();
                     try {
                         Thread.sleep(1000); // wait 1 second
@@ -150,10 +143,17 @@ public class Set extends Applet implements KeyListener, Runnable {
                 }
                 c.repaint();
                 t.resetTime(getScore(userScore), getScore(compScore));
-            }	
+			}
 			//System.out.println(t.timeLeft);
 			t.timeLeft -= 0.01;
 			t.repaint();
+            if (c.isOver) {
+                title.setText("Game Over");
+                t.timeLeft = 0;
+                t.repaint();
+                break;
+            }
+
 		}
 	}
 
@@ -248,7 +248,6 @@ public class Set extends Applet implements KeyListener, Runnable {
 		}
 		// repaints
 		c.repaint();
-
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -267,6 +266,7 @@ class SetCanvas extends Canvas {
 	protected Stack<Integer> deckOrder; // random, non-repeated indices to
 										// deckMaster
 	protected Vector<Integer> onDisplay; // cards on display
+	protected boolean isOver;
 
 	// constructors
 	public SetCanvas(Set s) {
@@ -274,6 +274,7 @@ class SetCanvas extends Canvas {
 		deckMaster = new int[81][4];
 		deckOrder = new Stack<Integer>();
 		onDisplay = new Vector<Integer>(26);
+		isOver = false;
 
 		// initialize deckMaster with all 81 permutations of {0,1,2}^3
 		for (int i = 0; i < 3; i++) {
@@ -295,7 +296,7 @@ class SetCanvas extends Canvas {
 		int counter = 0;
 		int randint;
 		Random randInt = new Random();
-		while (counter < 81) {
+		while (counter < 30) {
 			randint = Math.abs(randInt.nextInt() % 81);
 			// checks to see if randInt already in deckOrder
 			// expected O(n) time
@@ -358,6 +359,7 @@ class SetCanvas extends Canvas {
 	public void paint(Graphics g) {
 		// got the next two commands from:
 		// https://stackoverflow.com/questions/28477330/java-resize-double-buffer
+	    isOver = deckOrder.size() <= 3;
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		Image offscreen = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration()
@@ -440,7 +442,6 @@ class SetCanvas extends Canvas {
 		Color filling = getFilling(color, features[1]);
 		if (multiply < 1) {
 			// draws letter only if not big
-			parent.setFont(new Font("BellMT", Font.PLAIN, 20));
 			g.setColor(color);
 			g.drawString(Character.toString((char) (index + 97)),
 					x - 4 * w / 11, y - 4 * h / 11);
@@ -498,7 +499,8 @@ class TimerCanvas extends Canvas {
 	}
 
 	public void resetTime(int userScore, int compScore) {
-		timeAllotted = (double) (45 * (compScore + 1) / (userScore + 1));
+	    timeAllotted = 1;
+		//timeAllotted = (double) (45 * (compScore + 1) / (userScore + 1));
 		timeLeft = timeAllotted;
 		starttime = System.currentTimeMillis();
 	}
