@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*; // for Stack
 
-public class Set extends Applet implements KeyListener {
+public class Set extends Applet implements KeyListener, Runnable {
 
 	private static final long serialVersionUID = 1L; // avoid warning
 
@@ -19,43 +19,41 @@ public class Set extends Applet implements KeyListener {
 	protected TimerCanvas t;
 	protected Label userScore, compScore;
 	protected Vector<Integer> userEntry;
+	protected Thread thread;
+
 
 	public void init() {		
-	//initializes instance variables
-	    //nice, readable font
+	// initializes instance variables
+	    // nice, readable font
 		setFont(new Font("BellMT", Font.PLAIN, 16));
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
-		//store user's guesses
+		// store user's guesses
 		userEntry = new Vector<Integer>();
+
 		setLayout(new BorderLayout());
 		add("North", makeScorePanel()); // add at top
 		add("South", makeTimePanel()); // add at bottom
-		add("Center", makeSetPanell()); // add middle
+		add("Center", makeSetCanvas()); // add middle	
 	}
 
-	private Component makeSetPanell() {
-	//center canvas with cards
+	private Component makeSetCanvas() {
+	// center canvas with cards
 		c = new SetCanvas(this);
-		c.addKeyListener(this); //key listener
-		Panel setPanel = new Panel();
+		c.addKeyListener(this); // key listener
 
-		setPanel.setBackground(Color.white);
-		setPanel.setLayout(new BorderLayout());
-		setPanel.add("Center", c);
-
-		return setPanel;
+		return c;
 	}
 
 	private Component makeTimePanel() {
 	// panel for displaying time
-	    t = new TimerCanvas();
+	    Dimension d = new Dimension(getSize().width, 40);
+		t = new TimerCanvas(); 
 
-		Panel timePanel = new Panel();
-
-		timePanel.setBackground(Color.white);
-		timePanel.setLayout(new BorderLayout());
-		timePanel.add("Center", t);
+	    Panel timePanel = new Panel();
+	    timePanel.setPreferredSize(d);
+	    timePanel.setLayout(new BorderLayout());
+	    timePanel.add("Center", t);
 
 		return timePanel;
 	}
@@ -98,14 +96,60 @@ public class Set extends Applet implements KeyListener {
 		d.gridx = gridX;
 		d.gridy = gridY;
 	}
+	
+	public void start() {
+	    thread = new Thread(this);
+	    thread.start(); 
+	}
+	
+	public void stop() {
+	    thread = null;
+	}
 
+	public void run() {
+	    Thread currentThread = Thread.currentThread();
+	    t.starttime = System.currentTimeMillis();
+	    while (currentThread == thread) {
+	        try {
+	            Thread.sleep(10); // wait .1 seconds
+	        } catch (InterruptedException e) {
+	            // do nothing
+	        }
+
+	        if (t.timeLeft < 0) {
+	            computerTurn();
+	            t.resetTime(getScore(userScore), getScore(compScore));
+	        }
+	        t.timeLeft -= .01;
+	        t.repaint(); 
+	    }
+	}
+	
 	public void changeScore(Label score, int change) {
 	// changes score in a label
 		String[] sArray = score.getText().split(" "); // accesses current score
 		int value = Integer.parseInt(sArray[1]) + change; // updates score
 		score.setText(sArray[0] + " " + Integer.toString(value)); // puts label back together
 	}
-
+	
+	public int getScore(Label score) {
+	    return Integer.parseInt(score.getText().split(" ")[1]);
+	}
+	
+	public void computerTurn() {
+	    Vector <Integer[]> sets = c.findSets(c.onDisplay);
+	    if (sets.size() == 0) {
+	        changeScore(compScore, 1);
+	        c.onDisplay.add(c.deckOrder.pop());
+	    } else {
+	        changeScore(compScore, 3);
+	        c.onDisplay.remove(sets.get(0)[0]);
+	        c.onDisplay.remove(sets.get(0)[1]);
+	        c.onDisplay.remove(sets.get(0)[2]);
+	    }
+	    c.repaint();
+	}
+	
 	public void keyTyped(KeyEvent e) {
 	// placeholder
 	}
@@ -163,9 +207,7 @@ public class Set extends Applet implements KeyListener {
 		}
 		//repaints 
 		c.repaint();
-		t.timeAlloted = 50L;
-		t.timeLeft = 40L;
-		t.repaint();		
+	    t.resetTime(getScore(userScore), getScore(compScore));
 	}
 
 	public void keyReleased(KeyEvent e) {
@@ -176,7 +218,10 @@ public class Set extends Applet implements KeyListener {
 
 class SetCanvas extends Canvas {
 
-	// instance variables
+
+    private static final long serialVersionUID = 1L;
+
+    // instance variables
 	Set parent;
 	protected int[][] deckMaster; // 0,1,2,3 => color, filling, shape, number
 	protected Stack<Integer> deckOrder; // random, non-repeated indices to deckMaster
@@ -274,7 +319,7 @@ class SetCanvas extends Canvas {
 		}
 		return sets;
 	}
-
+	
 	public void paint(Graphics g) {
 	    // got the next two commands from:
 		// https://stackoverflow.com/questions/28477330/java-resize-double-buffer
@@ -405,20 +450,29 @@ class SetCanvas extends Canvas {
 
 class TimerCanvas extends Canvas {
     
+    private static final long serialVersionUID = 1L;
+
     // instance variables
-    long timeAlloted;
+    long starttime;
+    long timeAllotted;
     long timeLeft;
     
     // constructor
-    public void TimerCanvas() {
-        
+    public TimerCanvas() {
+        resetTime(0,0);
     }
-        
+    
+    public void resetTime(int userScore, int compScore) {
+        timeAllotted = (long) (45 * (compScore + 1) / (userScore + 1));
+        timeLeft = timeAllotted;
+        starttime = System.currentTimeMillis();
+    }
+    
     public void paint(Graphics g) {
         Dimension d = getSize();
-        int rectHeight = (int) d.getHeight();
-        int rectWidth = (int) (d.getWidth() * timeLeft / timeAlloted);
+        int rectWidth = (int) ((d.width * timeLeft / timeAllotted));
         g.setColor(new Color(255, 102, 102));
-        g.drawRect(0, 0, rectWidth, rectHeight);
+        g.setColor(Color.red);
+        g.fillRect(0, 0, rectWidth, 40);
     }
 }
