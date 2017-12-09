@@ -384,12 +384,14 @@ class SetCanvas extends Canvas {
 
 	public Color lighten(Color color) {
 		// lightens darker color to lighter color
+		Color lighter;
 		if (color == Colors.dteal)
-			return Colors.lteal;
-		if (color == Colors.dlave)
-			return Colors.llave;
+			lighter = Colors.lteal;
+		else if (color == Colors.dlave)
+			lighter = Colors.llave;
 		else // == dsalm
-			return Colors.lsalm;
+			lighter = Colors.lsalm;
+		return lighter;
 	}
 
 	public Color getColor(int i) {
@@ -402,7 +404,7 @@ class SetCanvas extends Canvas {
 		Color filling;
 		if (i == 0)
 			filling = Color.white;
-		if (i == 1)
+		else if (i == 1)
 			filling = lighten(color);
 		else // i == 2
 			filling = color;
