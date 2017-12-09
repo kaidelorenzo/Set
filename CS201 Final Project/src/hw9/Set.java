@@ -1,8 +1,9 @@
 package hw9;
-//Set
+// Set
 
-//Kai DeLorenzo & Teal Witter
-//CS 201 A HW 9
+// The world's best card game turned digital
+// Kai DeLorenzo & Teal Witter
+// CS 201A Final Project
 
 import java.applet.*;
 import java.awt.*;
@@ -11,26 +12,26 @@ import java.util.*; // for Stack
 
 @SuppressWarnings("deprecation")
 public class Set extends Applet implements KeyListener, Runnable {
-
 	private static final long serialVersionUID = 1L; // avoid warning
 
 	// instance variables
-	protected int time;
 	protected SetCanvas c;
 	protected TimerCanvas t;
 	protected Label title, userScore, compScore;
 	protected Vector<Integer> setEntry;
 	protected Thread thread;
+	protected boolean isOver;
 
 	public void init() {
-		// initializes instance variables
+		// initializes instance variables and creates layout
+
 		// nice, readable font
 		setFont(new Font("BellMT", Font.PLAIN, 20));
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
 		title = new Label("      Set      ", Label.CENTER);
-		// store user's guesses
-		setEntry = new Vector<Integer>();
+		setEntry = new Vector<Integer>(); // store user's guesses
+		isOver = false;
 
 		setLayout(new BorderLayout());
 		add("North", makeScorePanel()); // add at top
@@ -39,7 +40,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 	}
 
 	private Component makeSetCanvas() {
-		// center canvas with cards
+		// creates center canvas with shapes
 		c = new SetCanvas(this);
 		c.addKeyListener(this); // key listener
 
@@ -47,7 +48,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 	}
 
 	private Component makeTimePanel() {
-		// panel for displaying time
+		// panel for countdown timer
 		int timeHeight = 12;
 		Dimension d = new Dimension(getSize().width, timeHeight);
 		t = new TimerCanvas();
@@ -64,148 +65,147 @@ public class Set extends Applet implements KeyListener, Runnable {
 	private Component makeScorePanel() {
 		// score panel with title and credits
 		Panel scorePanel = new Panel();
-
 		scorePanel.setForeground(Color.white);
-		scorePanel.setBackground(Colors.dlave); // access color from canvas class
+		scorePanel.setBackground(Colors.dlave);
 		scorePanel.setLayout(new GridBagLayout());
-		GridBagConstraints d = new GridBagConstraints();
 
-		changeD(d, 0.5, 1, 1, 0, 0);
-		scorePanel.add(userScore, d);
+		GridBagConstraints contraints = new GridBagConstraints();
 
-		changeD(d, 0.5, 1, 1, 0, 1);
-		scorePanel.add(compScore, d);
+		changeGridBagConstraints(contraints, 0.5, 1, 1, 0, 0);
+		scorePanel.add(userScore, contraints);
 
-		changeD(d, 0.5, 2, 2, 1, 0);
+		changeGridBagConstraints(contraints, 0.5, 1, 1, 0, 1);
+		scorePanel.add(compScore, contraints);
+
+		changeGridBagConstraints(contraints, 0.5, 2, 2, 1, 0);
 		Panel titlePanel = new Panel();
 		titlePanel.setFont(new Font("BellMT", Font.PLAIN, 31));
 		titlePanel.add(title);
-		scorePanel.add(titlePanel, d);
+		scorePanel.add(titlePanel, contraints);
 
-		changeD(d, 0.5, 1, 1, 3, 1);
-		Label namesLabel = new Label("By Kai & Teal ", Label.RIGHT);
-		scorePanel.add((namesLabel), d);
+		changeGridBagConstraints(contraints, 0.5, 1, 1, 3, 1);
+		// Label namesLabel = new Label("By Kai & Teal ", Label.RIGHT);
+		scorePanel.add((new Label("By Kai & Teal ", Label.RIGHT)), contraints);
 
 		return scorePanel;
 	}
 
-	public void changeD(GridBagConstraints d, double weightX, int gridWidth,
-			int gridHeight, int gridX, int gridY) {
-		// manipulates words so that appear correctly
-		d.fill = GridBagConstraints.HORIZONTAL;
-		d.weightx = weightX;
-		d.gridwidth = gridWidth;
-		d.gridheight = gridHeight;
-		d.gridx = gridX;
-		d.gridy = gridY;
+	public void changeGridBagConstraints(GridBagConstraints c, double weightX,
+			int gridWidth, int gridHeight, int gridX, int gridY) {
+		// Changes GridBagConstraints
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.weightx = weightX;
+		c.gridwidth = gridWidth;
+		c.gridheight = gridHeight;
+		c.gridx = gridX;
+		c.gridy = gridY;
 	}
 
 	public void start() {
+		// initializes thread
 		thread = new Thread(this);
 		thread.start();
 	}
 
 	public void stop() {
+		// quits thread
 		thread = null;
 	}
 
 	public void run() {
 		Thread currentThread = Thread.currentThread();
-		// t.starttime = System.currentTimeMillis();
+		boolean timeToPaint = true;
 		while (currentThread == thread) {
 			try {
 				Thread.sleep(10); // wait .1 seconds
 			} catch (InterruptedException e) {
 				// do nothing
 			}
-
-			if (t.timeLeft < 0) {
-			    //computerTurn();
-                Vector<Integer[]> sets = c.findSets(c.onDisplay);
-                if (sets.size() == 0) {
-                    changeScore(compScore, 1);
-                    c.onDisplay.add(c.deckOrder.pop());
-                    c.onDisplay.add(c.deckOrder.pop());
-                    c.onDisplay.add(c.deckOrder.pop());
-                } else {
-                    changeScore(compScore, 3);
-                    // show the computer's set for one second
-                    setEntry = new Vector<Integer>(Arrays.asList(sets.get(0)));
-                    c.repaint();
-                    try {
-                        Thread.sleep(1000); // wait 1 second
-                    } catch (InterruptedException e){
-                        // do nothing
-                    }
-                    c.onDisplay.remove(sets.get(0)[0]);
-                    c.onDisplay.remove(sets.get(0)[1]);
-                    c.onDisplay.remove(sets.get(0)[2]);
-                }
-                setEntry.clear();
-                c.repaint();
-                t.resetTime(getScore(userScore), getScore(compScore));
-			}
-			//System.out.println(t.timeLeft);
+			computerTurn();
 			t.timeLeft -= 0.01;
-			t.repaint();
-            if (c.isOver) {
-                title.setText("Game Over");
-                t.timeLeft = 0;
-                t.repaint();
-                break;
-            }
-
+			if (timeToPaint) {
+				t.repaint();
+				timeToPaint = false;
+			} else {
+				timeToPaint = true;
+			}
+			if (isOver) {
+				title.setText("Game Over");
+				t.timeLeft = 0;
+				// System.out.println(c.deckOrder);
+				break;
+			}
 		}
 	}
 
 	public void changeScore(Label score, int change) {
-		// changes score in a label
+		// changes one of the score labels
 		String[] sArray = score.getText().split(" "); // accesses current score
-		int value = Math.max(0, Integer.parseInt(sArray[1]) + change); // updates
-																		// score
-		score.setText(sArray[0] + " " + Integer.toString(value)); // puts label
-																	// back
-																	// together
+		// updates score
+		int value = Math.max(0, Integer.parseInt(sArray[1]) + change);
+		// puts label back together
+		score.setText(sArray[0] + " " + Integer.toString(value));
 	}
 
 	public int getScore(Label score) {
+		// gets score from score label
 		return Integer.parseInt(score.getText().split(" ")[1]);
 	}
 
+	public void addCards(int num) {
+		for (int i = 0; i < num; i++) {
+			c.onDisplay.add(c.deckOrder.pop());
+		}
+	}
+
 	public void computerTurn() {
+		// gives computer points and changes board if the timer runs out
 		Vector<Integer[]> sets = c.findSets(c.onDisplay);
 		if (sets.size() == 0) {
 			changeScore(compScore, 1);
-			c.onDisplay.add(c.deckOrder.pop());
-			c.onDisplay.add(c.deckOrder.pop());
-			c.onDisplay.add(c.deckOrder.pop());
+			isOver = c.deckOrder.size() < 3;
+			if (!isOver) {
+				addCards(3);
+			} else {
+				c.removeKeyListener(c.getKeyListeners()[0]);
+			}
 		} else {
 			changeScore(compScore, 3);
-			c.onDisplay.remove(sets.get(0)[0]);
-			c.onDisplay.remove(sets.get(0)[1]);
-			c.onDisplay.remove(sets.get(0)[2]);
+			// show the computer's set for 2 seconds
+			setEntry = new Vector<Integer>(Arrays.asList(sets.get(0)));
+			c.repaint();
+			try {
+				Thread.sleep(2000); // wait 2 seconds
+			} catch (InterruptedException e) {
+				// do nothing
+			}
+			for (int i = 0; i < 3; i++) {
+				c.onDisplay.remove(sets.get(0)[i]);
+			}
 		}
+		setEntry.clear();
 		c.repaint();
-	}
-
-	public void keyTyped(KeyEvent e) {
-		// placeholder
+		t.resetTime(getScore(userScore), getScore(compScore));
 	}
 
 	public void keyPressed(KeyEvent e) {
 		// handles key presses
 		int keyCode = e.getKeyCode();
 		if (keyCode == KeyEvent.VK_BACK_SPACE && setEntry.size() != 0) {
-			// removes most recent element in setEntry 
+			// removes most recent element in setEntry
 			setEntry.remove(setEntry.size() - 1);
 		} else if (keyCode == KeyEvent.VK_ESCAPE) {
 			// user indicated they think there are no sets
+
 			if (c.findSets(c.onDisplay).size() == 0) {
-				// if there are no sets, give one point and add a card
+				// if there are no sets, give one point and add three cards
 				changeScore(userScore, 1);
-				c.onDisplay.add(c.deckOrder.pop());
-				c.onDisplay.add(c.deckOrder.pop());
-				c.onDisplay.add(c.deckOrder.pop());
+				isOver = c.deckOrder.size() < 3;
+				if (!isOver) {
+					addCards(3);
+				} else {
+					c.removeKeyListener(c.getKeyListeners()[0]);
+				}
 				t.resetTime(getScore(userScore), getScore(compScore));
 			} else {
 				// otherwise, minus one point!
@@ -228,9 +228,9 @@ public class Set extends Applet implements KeyListener, Runnable {
 			if (contained) {
 				// if contained, updates score and removes cards
 				changeScore(userScore, 3);
-				c.onDisplay.remove(setEntry.get(0));
-				c.onDisplay.remove(setEntry.get(1));
-				c.onDisplay.remove(setEntry.get(2));
+				for (int i = 0; i < 3; i++) {
+					c.onDisplay.remove(setEntry.get(i));
+				}
 				t.resetTime(getScore(userScore), getScore(compScore));
 			} else {
 				// else, minus 3!
@@ -247,7 +247,6 @@ public class Set extends Applet implements KeyListener, Runnable {
 			// if valid card is typed, then it is added
 			setEntry.add(c.onDisplay.get(keyCode - 65));
 		}
-		// repaints
 		c.repaint();
 	}
 
@@ -255,19 +254,21 @@ public class Set extends Applet implements KeyListener, Runnable {
 		// placeholder
 	}
 
+	public void keyTyped(KeyEvent e) {
+		// placeholder
+	}
 }
 
 class SetCanvas extends Canvas {
-
+	// main shapes canvas
 	private static final long serialVersionUID = 1L;
 
 	// instance variables
 	Set parent;
 	protected int[][] deckMaster; // 0,1,2,3 => color, filling, shape, number
-	protected Stack<Integer> deckOrder; // random, non-repeated indices to
-										// deckMaster
+	// random, non-repeated indices to deckMaster
+	protected Stack<Integer> deckOrder;
 	protected Vector<Integer> onDisplay; // cards on display
-	protected boolean isOver;
 
 	// constructors
 	public SetCanvas(Set s) {
@@ -275,7 +276,6 @@ class SetCanvas extends Canvas {
 		deckMaster = new int[81][4];
 		deckOrder = new Stack<Integer>();
 		onDisplay = new Vector<Integer>(26);
-		isOver = false;
 
 		// initialize deckMaster with all 81 permutations of {0,1,2}^3
 		for (int i = 0; i < 3; i++) {
@@ -358,17 +358,16 @@ class SetCanvas extends Canvas {
 	}
 
 	public void paint(Graphics g) {
+		// paints canvas
 		// got the next two commands from:
 		// https://stackoverflow.com/questions/28477330/java-resize-double-buffer
-	    isOver = deckOrder.size() <= 3;
 		Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
 		Image offscreen = GraphicsEnvironment.getLocalGraphicsEnvironment()
 				.getDefaultScreenDevice().getDefaultConfiguration()
 				.createCompatibleVolatileImage(d.width, d.height);
 		// offscreen image for double buffering
 		Graphics g2 = offscreen.getGraphics();
-		// carries over font to g2
-		g2.setFont(getFont());
+		g2.setFont(new Font("BellMT", Font.PLAIN, 25));
 		for (int i = 0; i < onDisplay.size(); i++) {
 			// check to see if in setEntry in order
 			if (parent.setEntry.contains(onDisplay.get(i))) {
@@ -382,12 +381,12 @@ class SetCanvas extends Canvas {
 	}
 
 	public Color lighten(Color color) {
-		// lightens darker color to ligher color
+		// lightens darker color to lighter color
 		if (color == Colors.dteal)
 			return Colors.lteal;
 		if (color == Colors.dlave)
 			return Colors.llave;
-		else
+		else // == dsalm
 			return Colors.lsalm;
 	}
 
@@ -398,12 +397,12 @@ class SetCanvas extends Canvas {
 
 	public Color getFilling(Color color, int i) {
 		// determines correct filling style depending on i
-		Color filling = null;
+		Color filling;
 		if (i == 0)
 			filling = Color.white;
 		if (i == 1)
 			filling = lighten(color);
-		if (i == 2)
+		else // i == 2
 			filling = color;
 		return filling;
 	}
@@ -486,7 +485,7 @@ class SetCanvas extends Canvas {
 }
 
 class TimerCanvas extends Canvas {
-
+	// bottom timer canvas
 	private static final long serialVersionUID = 1L;
 
 	// instance variables
@@ -500,13 +499,16 @@ class TimerCanvas extends Canvas {
 	}
 
 	public void resetTime(int userScore, int compScore) {
-		timeAllotted = (double) (30 * (compScore + 1) / (userScore + 1));
+		// sets time
+		int timeFactor = 18;
+		timeAllotted = (double) (timeFactor * (compScore + 1)
+				/ (userScore + 1));
 		timeLeft = timeAllotted;
 		starttime = System.currentTimeMillis();
 	}
 
-	// height
 	public void paint(Graphics g) {
+		// draw canvas
 		double factor = timeLeft / timeAllotted;
 		Dimension d = getSize();
 		int rectHeight = d.height;
@@ -514,14 +516,14 @@ class TimerCanvas extends Canvas {
 		g.setColor(getColor(factor));
 		g.fillRoundRect(0, 0, rectWidth, rectHeight, 3, 6);
 	}
-	public Color getColor(double power)
-	// https://stackoverflow.com/questions/340209/generate-colors-between-red-and-green-for-a-power-meter
-	{
-	    double H = power * 0.4; // Hue (note 0.4 = Green, see huge chart below)
-	    double S = 0.9; // Saturation
-	    double B = 0.9; // Brightness
 
-	    return Color.getHSBColor((float)H, (float)S, (float)B);
+	public Color getColor(double power) {
+		// Creates changing color from
+		// https://stackoverflow.com/questions/340209/generate-colors-between-red-and-green-for-a-power-meter
+		double H = power * 0.4; // Hue
+		double S = 0.9; // Saturation
+		double B = 0.9; // Brightness
+		return Color.getHSBColor((float) H, (float) S, (float) B);
 	}
 }
 
