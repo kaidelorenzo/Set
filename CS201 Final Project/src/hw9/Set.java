@@ -121,7 +121,9 @@ public class Set extends Applet implements KeyListener, Runnable {
 			} catch (InterruptedException e) {
 				// do nothing
 			}
-			computerTurn();
+			if (t.timeLeft < 0) {
+				computerTurn();
+			}
 			t.timeLeft -= 0.01;
 			if (timeToPaint) {
 				t.repaint();
