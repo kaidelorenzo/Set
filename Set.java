@@ -2,7 +2,7 @@ package hw9;
 // Set
 
 // The world's best card game turned digital
-// Kai DeLorenzo & Teal Witter
+// R. Teal Witter & Kai DeLorenzo
 // CS 201A Final Project
 
 import java.applet.*;
