@@ -1,18 +1,41 @@
-package hw9;
 // Set
 
 // The world's best card game turned digital
 // R. Teal Witter & Kai DeLorenzo
 // CS 201A Final Project
 
-import java.applet.*;
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*; // for Stack
 
-@SuppressWarnings("deprecation")
-public class Set extends Applet implements KeyListener, Runnable {
-	private static final long serialVersionUID = 1L; // avoid warning
+package set;
+
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Canvas;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Image;
+import java.awt.Label;
+import java.awt.Panel;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.util.Arrays;
+import java.util.Random;
+import java.util.Stack;
+import java.util.Vector;
+
+public class game extends Frame implements KeyListener, WindowListener, Runnable {
+
+	private static final long serialVersionUID = -1970616790448507289L;
 
 	// instance variables
 	protected SetCanvas c;
@@ -22,11 +45,18 @@ public class Set extends Applet implements KeyListener, Runnable {
 	protected Thread thread;
 	protected boolean isOver;
 
-	public void init() {
+	public static void main(String args[]) {
+		new game();
+	}
+
+	game() {
 		// initializes instance variables and creates layout
 
-		// nice, readable font
-		setFont(new Font("BellMT", Font.PLAIN, 20));
+		addWindowListener(this);
+		setBounds(0, 0, 700, 600);
+		setTitle("Set");
+		
+		setFont(new Font("BellMT", Font.PLAIN, 20)); // nice, readable font
 		userScore = new Label("USER: 0");
 		compScore = new Label("COMP: 0");
 		title = new Label("      Set      ", Label.CENTER);
@@ -37,6 +67,8 @@ public class Set extends Applet implements KeyListener, Runnable {
 		add("North", makeScorePanel()); // add at top
 		add("South", makeTimePanel()); // add at bottom
 		add("Center", makeSetCanvas()); // add middle
+		setVisible(true);
+		
 	}
 
 	private Component makeSetCanvas() {
@@ -90,8 +122,8 @@ public class Set extends Applet implements KeyListener, Runnable {
 		return scorePanel;
 	}
 
-	public void changeGridBagConstraints(GridBagConstraints c, double weightX,
-			int gridWidth, int gridHeight, int gridX, int gridY) {
+	public void changeGridBagConstraints(GridBagConstraints c, double weightX, int gridWidth, int gridHeight, int gridX,
+			int gridY) {
 		// Changes GridBagConstraints
 		c.fill = GridBagConstraints.HORIZONTAL;
 		c.weightx = weightX;
@@ -99,17 +131,6 @@ public class Set extends Applet implements KeyListener, Runnable {
 		c.gridheight = gridHeight;
 		c.gridx = gridX;
 		c.gridy = gridY;
-	}
-
-	public void start() {
-		// initializes thread
-		thread = new Thread(this);
-		thread.start();
-	}
-
-	public void stop() {
-		// quits thread
-		thread = null;
 	}
 
 	public void run() {
@@ -244,8 +265,7 @@ public class Set extends Applet implements KeyListener, Runnable {
 			// if existing card typed again, then it is removed
 			setEntry.remove(c.onDisplay.get(keyCode - 65));
 
-		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65
-				&& setEntry.size() < 3) {
+		} else if (65 <= keyCode && keyCode < c.onDisplay.size() + 65 && setEntry.size() < 3) {
 			// if valid card is typed, then it is added
 			setEntry.add(c.onDisplay.get(keyCode - 65));
 		}
@@ -259,6 +279,46 @@ public class Set extends Applet implements KeyListener, Runnable {
 	public void keyTyped(KeyEvent e) {
 		// placeholder
 	}
+
+	public void windowClosing(WindowEvent e) {
+		System.exit(0);
+	}
+
+	@Override
+	public void windowOpened(WindowEvent e) {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void windowClosed(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowIconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowDeiconified(WindowEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void windowActivated(WindowEvent e) {
+		// initializes thread
+		thread = new Thread(this);
+		thread.start();
+	}
+
+	@Override
+	public void windowDeactivated(WindowEvent e) {
+		// quits thread
+		thread = null;
+	}
 }
 
 class SetCanvas extends Canvas {
@@ -266,14 +326,14 @@ class SetCanvas extends Canvas {
 	private static final long serialVersionUID = 1L;
 
 	// instance variables
-	Set parent;
+	game parent;
 	protected int[][] deckMaster; // 0,1,2,3 => color, filling, shape, number
 	// random, non-repeated indices to deckMaster
 	protected Stack<Integer> deckOrder;
 	protected Vector<Integer> onDisplay; // cards on display
 
 	// constructors
-	public SetCanvas(Set s) {
+	public SetCanvas(game s) {
 		parent = s; // allows access to parent instance variables
 		deckMaster = new int[81][4];
 		deckOrder = new Stack<Integer>();
@@ -488,6 +548,7 @@ class SetCanvas extends Canvas {
 	}
 }
 
+
 class TimerCanvas extends Canvas {
 	// bottom timer canvas
 	private static final long serialVersionUID = 1L;
@@ -530,6 +591,7 @@ class TimerCanvas extends Canvas {
 		return Color.getHSBColor((float) H, (float) S, (float) B);
 	}
 }
+
 
 final class Colors {
 	// pretty colors :)
