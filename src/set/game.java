@@ -272,52 +272,38 @@ public class game extends Frame implements KeyListener, WindowListener, Runnable
 		c.repaint();
 	}
 
-	public void keyReleased(KeyEvent e) {
-		// placeholder
-	}
-
-	public void keyTyped(KeyEvent e) {
-		// placeholder
-	}
-
-	public void windowClosing(WindowEvent e) {
-		System.exit(0);
-	}
-
-	@Override
-	public void windowOpened(WindowEvent e) {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void windowClosed(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowIconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void windowDeiconified(WindowEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void windowActivated(WindowEvent e) {
 		// initializes thread
 		thread = new Thread(this);
 		thread.start();
 	}
 
-	@Override
 	public void windowDeactivated(WindowEvent e) {
 		// quits thread
 		thread = null;
+	}
+
+	public void windowClosing(WindowEvent e) {
+		System.exit(0);
+	}
+	
+	public void keyReleased(KeyEvent e) {
+		// placeholder
+	}
+	public void keyTyped(KeyEvent e) {
+		// placeholder
+	}
+	public void windowOpened(WindowEvent e) {
+		// placeholder
+	}
+	public void windowClosed(WindowEvent e) {
+		// placeholder
+	}
+	public void windowIconified(WindowEvent e) {
+		// placeholder
+	}
+	public void windowDeiconified(WindowEvent e) {
+		// placeholder
 	}
 }
 
