@@ -58,6 +58,7 @@ body:
         - "Yes"
         - "No"
         - N/A
+    validations:
       required: true
   - type: textarea
     id: logs
