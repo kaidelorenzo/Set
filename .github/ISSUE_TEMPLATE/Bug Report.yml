@@ -38,6 +38,7 @@ body:
       label: What plugins are you seeing the problem on?
       multiple: true
       options:
+        - All
         - Youtube
         - BiliBili (CN)
         - Twitch (Beta)
@@ -49,6 +50,8 @@ body:
         - Nebula (Beta)
         - SoundCloud
         - Other
+    validations:
+      required: true
   - type: dropdown
     id: login
     attributes:
