@@ -71,6 +71,5 @@ body:
       render: shell
  - type: markdown
    attributes:
-     value: |
-       ## Video/Screenshot
+     value: ## Video/Screenshot |
        Please include a screen recording or screenshot of the issue if possible
