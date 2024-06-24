@@ -57,7 +57,7 @@ body:
       options:
         - "Yes"
         - "No"
-        - "N/A
+        - N/A
       required: true
   - type: textarea
     id: logs
