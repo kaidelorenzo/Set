@@ -72,5 +72,5 @@ body:
  - type: markdown
    attributes:
      value: |
-       ## Video/Screenshot |
+       "## Video/Screenshot" |
        Please include a screen recording or screenshot of the issue if possible
