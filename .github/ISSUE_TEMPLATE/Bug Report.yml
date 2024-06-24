@@ -52,11 +52,13 @@ body:
   - type: dropdown
     id: login
     attributes:
-      label: Are you expiriencing the issue when logged out?
+      label: Are you expiriencing the issue when logged in?
       multiple: false
       options:
         - "Yes"
         - "No"
+        - "N/A
+      required: true
   - type: textarea
     id: logs
     attributes:
