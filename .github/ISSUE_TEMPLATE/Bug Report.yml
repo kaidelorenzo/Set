@@ -55,8 +55,8 @@ body:
       label: Are you expiriencing the issue when logged out?
       multiple: false
       options:
-        - Yes
-        - No
+        - "Yes"
+        - "No"
   - type: textarea
     id: logs
     attributes:
