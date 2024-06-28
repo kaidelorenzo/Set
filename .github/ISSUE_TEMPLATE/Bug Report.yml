@@ -7,9 +7,8 @@ body:
     attributes:
       value: |
         # Thank you for taking the time to fill out this bug report.
-        
+      
         The [grayjay-android](https://github.com/futo-org/grayjay-android) issue tracker is reserved for issues relating to the Grayjay Android Application
-
         For general usage questions, please see: [The Official FUTO Grayjay Zulip Channel](https://chat.futo.org/#narrow/stream/46-Grayjay)
 
         ## Filing a bug report
