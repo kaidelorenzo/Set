@@ -62,8 +62,6 @@ body:
       label: Plugin Version
       description: In the application, select Sources > [the broken plugin], write down the value under "Version".
       placeholder: "12"
-    validations:
-      required: true
 
   - type: checkboxes
     id: login
