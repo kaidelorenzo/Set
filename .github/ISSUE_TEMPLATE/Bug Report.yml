@@ -62,7 +62,7 @@ body:
         - Other
     validations:
       required: true
-  - type: checkbox
+  - type: checkboxes
     id: login
     attributes:
       label: When do you experience the issue
