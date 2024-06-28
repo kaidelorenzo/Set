@@ -7,11 +7,8 @@ body:
       value: |
         # Thank you for opening a feature request.
 
-        The [grayjay-android](https://github.com/futo-org/grayjay-android) issue tracker is reserved for issues relating to the Grayjay Android Application
-
-        [External Contributions are close at this time](https://github.com/tom-futo/grayjay-android/blob/master/CONTRIBUTION.md#contributing-to-core)
-
-        For discussion related to enhancements, please see: [The FUTO Grayjay Zulip Channel](https://chat.futo.org/#narrow/stream/46-Grayjay)
+        The [grayjay-android](https://github.com/futo-org/grayjay-android) issue tracker is reserved for
+        issues relating to the Grayjay Android Application [External Contributions are closed at this time](https://github.com/tom-futo/grayjay-android/blob/master/CONTRIBUTION.md#contributing-to-core) For discussion related to enhancements, please see: [The FUTO Grayjay Zulip Channel](https://chat.futo.org/#narrow/stream/46-Grayjay)
 
   - type: textarea
     id: grayjay-use-case
