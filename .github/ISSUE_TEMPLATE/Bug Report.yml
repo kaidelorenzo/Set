@@ -31,7 +31,6 @@ body:
     attributes:
       label: Grayjay Version
       description: In the application, select More > Settings, scroll to the bottom and locate the value next to "Version Name".
-      render: shell
       placeholder: "242"
     validations:
       required: true
