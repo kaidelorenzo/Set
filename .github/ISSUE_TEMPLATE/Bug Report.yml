@@ -66,11 +66,10 @@ body:
     id: login
     attributes:
       label: When do you experience the issue
-      multiple: false
       options:
-        - While logged in
-        - While logged out
-        - N/A
+      - label: While logged in
+      - label: While logged out
+      - label: N/A
     validations:
       required: true
   - type: textarea
