@@ -19,7 +19,9 @@ body:
       label: Use Cases
       description: |
         In order to properly evaluate a feature request, it is necessary to understand the use cases for it.
+        
         Please describe below the _end goal_ you are trying to achieve that has led you to request this feature.
+        
         Please keep this section focused on the problem and not on the suggested solution.
       placeholder:
       value:
