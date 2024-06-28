@@ -6,7 +6,17 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this bug report!
+        # Thank you for taking the time to fill out this bug report.
+        
+        The [grayjay-android](https://github.com/futo-org/grayjay-android) issue tracker is reserved for issues relating to the Grayjay Android Application
+
+        For general usage questions, please see: [The Official FUTO Grayjay Zulip Channel](https://chat.futo.org/#narrow/stream/46-Grayjay)
+
+        ## Filing a bug report
+
+        To fix your issues faster, we need clear reproduction cases - ideally allowing us to make it happen locally. 
+        * Please include all needed context. For example, Device, OS, Application, your Grayjay Configurations and Plugin versioning info.
+        * if you've found out a particular series of UI interactions can introduce buggy behavior, please label those steps 1-n with markdown
   - type: input
     id: contact
     attributes:
@@ -52,14 +62,14 @@ body:
         - Other
     validations:
       required: true
-  - type: dropdown
+  - type: checkbox
     id: login
     attributes:
-      label: Are you expiriencing the issue when logged in?
+      label: When do you experience the issue
       multiple: false
       options:
-        - "Yes"
-        - "No"
+        - While logged in
+        - While logged out
         - N/A
     validations:
       required: true
